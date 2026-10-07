@@ -11,6 +11,7 @@
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23080807'/%3E%3Ccircle cx='50' cy='50' r='16' fill='none' stroke='%23D2C3A0' stroke-width='5'/%3E%3C/svg%3E">
 <link rel="preload" as="image" href="media/poster-1.jpg">
+<link rel="preload" as="image" href="image/ring-hero.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -49,15 +50,18 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
 .lb i{display:block;height:100%;background:var(--ac);transform-origin:left;scale:0 1;transition:scale .25s linear}
 #lpc{font-size:.62rem;letter-spacing:.2em;color:var(--dim);font-variant-numeric:tabular-nums}
 
-/* усиленное зерно, чтобы замаскировать компресссию видео */
+/*
+  Усиленное зерно.
+  Оно помогает замаскировать компрессию, блочность и шум видео.
+*/
 .grain{
   position:fixed;
   inset:0;
   z-index:60;
   pointer-events:none;
-  opacity:.085;
+  opacity:.095;
   mix-blend-mode:soft-light;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.88' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.62'/%3E%3C/svg%3E")
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.66'/%3E%3C/svg%3E")
 }
 
 /* the film: a 650vh scroll with a pinned stage */
@@ -66,11 +70,12 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
 .stage{position:absolute;inset:0;z-index:0;pointer-events:none}
 
 /*
-  Видео нельзя заменить, поэтому визуально улучшаем его через:
-  - contrast / brightness / saturate;
-  - очень лёгкий blur, чтобы убрать квадратные артефакты;
-  - медленный zoom, чтобы картинка не стояла мёртво;
-  - виньетку и цветовой оверлей ниже.
+  Видео нельзя заменить, поэтому визуально улучшаем его:
+  - небольшое увеличение, чтобы обрезать края и артефакты;
+  - мягкий blur, чтобы убрать квадратные блоки;
+  - contrast / brightness / saturate для киношного цвета;
+  - медленный Ken Burns, чтобы кадр не выглядел статично;
+  - дополнительные оверлеи ниже.
 */
 .stage video{
   position:absolute;
@@ -79,29 +84,29 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
   height:100%;
   object-fit:cover;
   opacity:0;
-  filter:contrast(1.18) saturate(.82) brightness(.76) blur(.35px);
-  transform:scale(var(--kb-a,1.04));
+  --kb-a:1.09;
+  --kb-b:1.14;
+  transform:scale(var(--kb-a));
+  filter:blur(.48px) contrast(1.24) saturate(.74) brightness(.70);
   transition:opacity .7s ease-in-out;
   will-change:opacity,transform,filter;
-  animation:kenburns 28s ease-in-out infinite alternate;
-  --kb-a:1.04;
-  --kb-b:1.09;
+  animation:kenburns 32s ease-in-out infinite alternate;
 }
 @keyframes kenburns{
   from{transform:scale(var(--kb-a))}
   to{transform:scale(var(--kb-b))}
 }
 
-.vg,.gt,.gb,.gl,.gc{position:absolute;pointer-events:none}
+.vg,.gt,.gb,.gl,.gc,.vb,.vs{position:absolute;pointer-events:none}
 
 /* более глубокая виньетка */
 .vg{
   inset:0;
   background:radial-gradient(
-    ellipse 70% 74% at 58% 50%,
-    transparent 24%,
-    rgba(0,0,0,.42) 62%,
-    rgba(0,0,0,.82) 88%,
+    ellipse 68% 72% at 58% 50%,
+    transparent 20%,
+    rgba(0,0,0,.46) 58%,
+    rgba(0,0,0,.86) 86%,
     #000 100%
   )
 }
@@ -111,12 +116,35 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
   inset:0;
   background:linear-gradient(
     115deg,
-    rgba(26,15,6,.34),
-    rgba(0,0,0,.18) 42%,
-    rgba(210,195,160,.10)
+    rgba(26,15,6,.36),
+    rgba(0,0,0,.20) 42%,
+    rgba(210,195,160,.12)
   );
   mix-blend-mode:overlay;
-  opacity:.72;
+  opacity:.76;
+}
+
+/* мягкий bloom, чтобы сгладить резкие артефакты */
+.vb{
+  inset:0;
+  background:radial-gradient(
+    circle at 52% 42%,
+    rgba(210,195,160,.14),
+    transparent 40%,
+    rgba(0,0,0,.20) 78%
+  );
+  mix-blend-mode:soft-light;
+  opacity:.58;
+}
+
+/* очень тонкая текстура, имитирующая плёнку */
+.vs{
+  inset:0;
+  background-image:
+    repeating-linear-gradient(to bottom, rgba(255,255,255,.030) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(to right, rgba(0,0,0,.020) 0 1px, transparent 1px 4px);
+  mix-blend-mode:overlay;
+  opacity:.14;
 }
 
 .gt{top:0;left:0;right:0;height:11rem;background:linear-gradient(#000d,transparent)}
@@ -255,9 +283,9 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
   .nav{gap:1.8rem}
   .fly{bottom:auto;top:50%;translate:0 -50%;left:2rem;width:260px}
   .stage video{
-    --kb-a:1.01;
-    --kb-b:1.05;
-    filter:contrast(1.15) saturate(.84) brightness(.78) blur(.28px);
+    --kb-a:1.05;
+    --kb-b:1.09;
+    filter:blur(.36px) contrast(1.20) saturate(.78) brightness(.74);
   }
   .panel{top:0;left:0;right:auto;bottom:auto;height:100%;max-height:none;width:100%;max-width:600px;border-radius:0;padding:2.2rem 2.2rem 0;transform:translateX(-100%);box-shadow:12px 0 45px rgba(0,0,0,.28)}
   .panel.open{transform:none}
@@ -273,9 +301,9 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
 
 @media(max-width:699px){
   .stage video{
-    --kb-a:1.06;
-    --kb-b:1.12;
-    filter:contrast(1.22) saturate(.78) brightness(.72) blur(.55px);
+    --kb-a:1.12;
+    --kb-b:1.18;
+    filter:blur(.58px) contrast(1.26) saturate(.72) brightness(.68);
   }
 }
 
@@ -313,7 +341,7 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
   .stage video{
     animation:none;
     transform:scale(var(--kb-a));
-    filter:contrast(1.12) saturate(.86) brightness(.82) blur(.18px);
+    filter:blur(.22px) contrast(1.14) saturate(.84) brightness(.80);
   }
 }
 </style>
@@ -342,8 +370,10 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
     <div class="stage" aria-hidden="true">
       <video id="v1" poster="media/poster-1.jpg" muted playsinline preload="auto"></video>
       <video id="v2" poster="media/poster-2.jpg" muted playsinline preload="auto"></video>
+      <div class="vb"></div>
       <div class="gc"></div>
       <div class="vg"></div>
+      <div class="vs"></div>
       <div class="gt"></div>
       <div class="gb"></div>
       <div class="gl"></div>
@@ -393,7 +423,7 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
             <p data-s=".21,.32">Every piece is made to be worn close to the skin and kept for a lifetime.</p>
           </div>
         </div>
-        <!-- Продукт-карточка справа убрана: на её месте теперь пусто, только видео. -->
+        <!-- Продукт-карточка справа убрана: на её месте пусто, только видео. -->
       </div>
     </div>
 
@@ -405,10 +435,14 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
       </span>
     </a>
 
-    <a class="fly" id="fly2" href="#contact" data-ask="Sculpture Ring" data-fly=".77,.87,.90">
+    <!--
+      Вместо ring-sculpture.jpg теперь ring-hero.jpg.
+      Вместо Sculpture Ring — Abyssal Ring и его характеристики.
+    -->
+    <a class="fly" id="fly2" href="#contact" data-ask="Abyssal Ring" data-fly=".77,.87,.90">
       <span class="fi">
-        <span class="ph"><img src="image/ring-sculpture.jpg" alt="Sculpture Ring"></span>
-        <span class="nm"><span>Sculpture Ring</span><span>$540</span></span>
+        <span class="ph"><img src="image/ring-hero.jpg" alt="Abyssal Ring"></span>
+        <span class="nm"><span>Abyssal Ring</span><span>$1,950</span></span>
         <span class="mo">View the piece</span>
       </span>
     </a>
@@ -651,16 +685,16 @@ const PIECES=[
     ]
   },
   {
-    cat:"Sculpture Ring",
-    title:"Sterling Silver Sculpture Ring",
-    price:540,
-    img:"image/ring-sculpture.jpg",
-    desc:"One flowing form in sterling silver, polished to a mirror where it catches the light and brushed where the light should rest.",
+    cat:"Abyssal Ring",
+    title:"18K White Gold & Rough Onyx",
+    price:1950,
+    img:"image/ring-hero.jpg",
+    desc:"A raw, uncut onyx set in a hand-hammered 18K white gold band. No two stones are alike.",
     spec:[
-      ["Metal","Sterling silver 925"],
-      ["Finish","Polished and brushed"],
-      ["Sizes","EU 48–62, free resizing in 90 days"],
-      ["Made","Ready to ship in 7–10 days"]
+      ["Metal","18K white gold"],
+      ["Stone","Rough black onyx"],
+      ["Band","Hand-hammered"],
+      ["Made","To order, 3–4 weeks"]
     ]
   }
 ];
