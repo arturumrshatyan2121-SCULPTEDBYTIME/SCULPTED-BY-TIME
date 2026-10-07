@@ -51,29 +51,17 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
 #lpc{font-size:.62rem;letter-spacing:.2em;color:var(--dim);font-variant-numeric:tabular-nums}
 
 /*
-  Живое зерно. Элемент расширен за вьюпорт (inset:-20%), чтобы тряска
-  позицией не оголяла края экрана. Дёргаем позицию резкими шагами —
-  это имитирует шум плёнки и маскирует компрессию/блочность 720p.
+  Усиленное зерно.
+  Оно помогает замаскировать компрессию, блочность и шум видео.
 */
 .grain{
   position:fixed;
-  inset:-20%;
+  inset:0;
   z-index:60;
   pointer-events:none;
-  opacity:.10;
+  opacity:.095;
   mix-blend-mode:soft-light;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.66'/%3E%3C/svg%3E");
-  background-size:180px 180px;
-  animation:grainShift .5s steps(5) infinite;
-  will-change:transform;
-}
-@keyframes grainShift{
-  0%{transform:translate(0,0)}
-  20%{transform:translate(-3%,2%)}
-  40%{transform:translate(2%,-4%)}
-  60%{transform:translate(-2%,3%)}
-  80%{transform:translate(4%,-2%)}
-  100%{transform:translate(0,0)}
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.66'/%3E%3C/svg%3E")
 }
 
 /* the film: a 650vh scroll with a pinned stage */
@@ -83,11 +71,11 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
 
 /*
   Видео нельзя заменить, поэтому визуально улучшаем его:
-  - увеличение, чтобы обрезать растянутые края и артефакты;
-  - мягкий blur против квадратных блоков;
+  - небольшое увеличение, чтобы обрезать края и артефакты;
+  - мягкий blur, чтобы убрать квадратные блоки;
   - contrast / brightness / saturate для киношного цвета;
   - медленный Ken Burns, чтобы кадр не выглядел статично;
-  - оверлеи ниже (bloom, grade, виньетка, сканлайны).
+  - дополнительные оверлеи ниже.
 */
 .stage video{
   position:absolute;
@@ -109,24 +97,7 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
   to{transform:scale(var(--kb-b))}
 }
 
-.vg,.gt,.gb,.gl,.gc,.vb,.vs,.vbl{position:absolute;pointer-events:none}
-
-/*
-  Bloom без второго декодера: тёплое свечение в screen по зоне продукта.
-  Высветляет блики металла/камней и сглаживает блоки компрессии,
-  не добавляя нагрузку на скраббинг (поэтому видео-дубли не заведены).
-*/
-.vbl{
-  inset:0;
-  background:radial-gradient(
-    circle 40% at 56% 46%,
-    rgba(210,195,160,.22),
-    rgba(210,195,160,.07) 46%,
-    transparent 72%
-  );
-  mix-blend-mode:screen;
-  opacity:.6;
-}
+.vg,.gt,.gb,.gl,.gc,.vb,.vs{position:absolute;pointer-events:none}
 
 /* более глубокая виньетка */
 .vg{
@@ -153,7 +124,7 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
   opacity:.76;
 }
 
-/* мягкий secondary bloom, чтобы сгладить резкие артефакты */
+/* мягкий bloom, чтобы сгладить резкие артефакты */
 .vb{
   inset:0;
   background:radial-gradient(
@@ -166,14 +137,14 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
   opacity:.58;
 }
 
-/* очень тонкая текстура, имитирующая плёнку (приглушена против полос) */
+/* очень тонкая текстура, имитирующая плёнку */
 .vs{
   inset:0;
   background-image:
     repeating-linear-gradient(to bottom, rgba(255,255,255,.030) 0 1px, transparent 1px 3px),
     repeating-linear-gradient(to right, rgba(0,0,0,.020) 0 1px, transparent 1px 4px);
   mix-blend-mode:overlay;
-  opacity:.11;
+  opacity:.14;
 }
 
 .gt{top:0;left:0;right:0;height:11rem;background:linear-gradient(#000d,transparent)}
@@ -207,7 +178,7 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
 .man p{width:270px;font-size:.72rem;line-height:1.7;color:var(--mut)}
 [data-s]{will-change:opacity,transform}
 
-/* product that arrives from the left (показывается ОДИН раз за фильм) */
+/* product that arrives from the left */
 .fly{position:absolute;z-index:20;left:1rem;bottom:5.5rem;width:46vw;max-width:300px;display:block;opacity:0;pointer-events:none}
 .fly .fi{display:block;transition:opacity .4s var(--e),visibility 0s}
 .fly.gone .fi{opacity:0;visibility:hidden;transition:opacity .35s var(--e),visibility 0s .35s}
@@ -350,12 +321,6 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
   .cg{grid-template-columns:1fr 1fr;gap:5rem}
   #fab{left:auto;right:2rem;bottom:2rem;padding:1rem 1.8rem}
   .fly{left:3rem;width:300px}
-  /* на больших экранах 720p режем кропом, а не растягиваем в мыло */
-  .stage video{
-    --kb-a:1.13;
-    --kb-b:1.19;
-    filter:blur(.5px) contrast(1.22) saturate(.76) brightness(.72);
-  }
 }
 
 @media(min-width:980px) and (max-height:780px){
@@ -367,7 +332,6 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
 @media(prefers-reduced-motion:reduce){
   .rv{transition:none;opacity:1;translate:none}
   .mq div{animation:none}
-  .grain{animation:none}
   #ov .hd,#ov .ttl,#ov .man{opacity:1}
   .go #ov .hd,.go #ov .ttl,.go #ov .man{
     animation:none!important;
@@ -406,7 +370,6 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
     <div class="stage" aria-hidden="true">
       <video id="v1" poster="media/poster-1.jpg" muted playsinline preload="auto"></video>
       <video id="v2" poster="media/poster-2.jpg" muted playsinline preload="auto"></video>
-      <div class="vbl"></div>
       <div class="vb"></div>
       <div class="gc"></div>
       <div class="vg"></div>
@@ -464,16 +427,22 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
       </div>
     </div>
 
-    <!--
-      ЕДИНСТВЕННЫЙ продуктовый акт фильма.
-      Герой = Aura Drop Earrings: согласован с первым видео (на кадре серьга),
-      поэтому карточка не спорит с картинкой. Abyssal Ring остался в коллекции внизу.
-      Второй акт (кольцо в финале) убран по просьбе «продукт один раз, а не два».
-    -->
     <a class="fly" id="fly1" href="#contact" data-ask="Aura Drop Earrings" data-fly=".27,.37,.40">
       <span class="fi">
         <span class="ph"><img src="image/earrings.jpg" alt="Aura Drop Earrings"></span>
         <span class="nm"><span>Aura Drop Earrings</span><span>$3,400</span></span>
+        <span class="mo">View the piece</span>
+      </span>
+    </a>
+
+    <!--
+      Вместо ring-sculpture.jpg теперь ring-hero.jpg.
+      Вместо Sculpture Ring — Abyssal Ring и его характеристики.
+    -->
+    <a class="fly" id="fly2" href="#contact" data-ask="Abyssal Ring" data-fly=".77,.87,.90">
+      <span class="fi">
+        <span class="ph"><img src="image/ring-hero.jpg" alt="Abyssal Ring"></span>
+        <span class="nm"><span>Abyssal Ring</span><span>$1,950</span></span>
         <span class="mo">View the piece</span>
       </span>
     </a>
@@ -701,12 +670,6 @@ Promise.all([
 const ST=$$("[data-s]").map(el=>{const[a,b]=el.dataset.s.split(",").map(Number);return{el,a,b,r:-1}});
 const FL=$$("[data-fly]").map(el=>{const[a,b,h]=el.dataset.fly.split(",").map(Number);return{el,a,b,h,r:-1}});
 
-/*
-  PIECES[0] = герой фильма (показывается один раз в единственной панели).
-  PIECES[1] = Abyssal Ring — резерв: в фильме не крутится (второй акт убран),
-  живёт только в коллекции внизу. Чтобы сделать кольцом ЕДИНСТВЕННЫМ героем,
-  поменяй объекты местами и синхронно поправь fly1 в HTML (data-ask, img, nm, pr).
-*/
 const PIECES=[
   {
     cat:"Aura Drop Earrings",
@@ -799,12 +762,8 @@ function frame(t){
     st.pointerEvents=1-k<.15?"none":""
   }
 
-  /*
-    ОДИН продуктовый акт: панель открывается только в середине (.4–.5)
-    и всегда показывает PIECES[0]. Ветка p>=.9 (второй продукт) убрана.
-    Вторая половина фильма = молчаливое второе видео + #fab как CTA.
-  */
-  const open=p>=.4&&p<.5,sec=false;
+  /* the product arrives from the left, then opens into the sheet */
+  const open=(p>=.4&&p<.5)||p>=.9,sec=p>=.9;
 
   for(const f of FL){
     const k=eo(cl((p-f.a)/(f.b-f.a)));
@@ -841,8 +800,7 @@ requestAnimationFrame(frame);
 addEventListener("touchstart",()=>[v1,v2].forEach(v=>{v.play().then(()=>v.pause()).catch(()=>{})}),{once:true,passive:true});
 
 const jump=f=>goTo(story.getBoundingClientRect().top+scrollY+f*(story.offsetHeight-pin.offsetHeight));
-/* возврат из единственной панели к интро/продукту (ветка .9 больше не нужна) */
-$("#back").addEventListener("click",()=>jump(.33));
+$("#back").addEventListener("click",()=>jump(target>=.9?.8:.33));
 
 /*
   enquiries
