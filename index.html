@@ -5,13 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Aurelle — Sculpted by Time</title>
 <meta name="description" content="Aurelle makes modern jewelry in 18K gold and sterling silver. Pieces made to order, viewings by appointment.">
-<meta theme-color content="#080807">
+<meta name="theme-color" content="#080807">
 <meta property="og:title" content="Aurelle — Sculpted by Time">
 <meta property="og:description" content="Modern jewelry in 18K gold and sterling silver. Book a private viewing.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23080807'/%3E%3Ccircle cx='50' cy='50' r='16' fill='none' stroke='%23D2C3A0' stroke-width='5'/%3E%3C/svg%3E">
 <link rel="preload" as="image" href="media/poster-1.jpg">
-<link rel="preload" as="image" href="image/ring-sculpture.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -149,15 +148,6 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
 .ttl .in1{padding-left:.8em}
 .man{display:none;gap:1.2rem;margin-top:1.6rem}
 .man p{width:270px;font-size:.72rem;line-height:1.7;color:var(--mut)}
-.cap{display:none}
-.pc{justify-self:end;width:42vw;max-width:240px;order:-1}
-.pc .lb2{font:500 .6rem/1 var(--in);letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
-.pc .card{display:block;aspect-ratio:4/5;margin-top:.6rem;overflow:hidden;transition:transform .6s var(--e)}
-.pc .card img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--e);-webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 60%,transparent 100%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 60%,transparent 100%)}
-.pc:hover .card{transform:scale(1.03)}
-.pc:hover .card img{transform:scale(1.05)}
-.pc .pr{text-align:center;font:400 1.6rem/1 var(--bd);margin-top:.5rem;transition:color .3s}
-.pc:hover .pr{color:var(--ac)}
 [data-s]{will-change:opacity,transform}
 
 /* product that arrives from the left */
@@ -247,23 +237,22 @@ details p{margin-top:.8rem;max-width:42rem;font-size:.9rem;line-height:1.7;color
 .cf .go{justify-self:start;background:var(--iv);color:#141210;padding:1rem 2.1rem;font:500 .66rem/1 var(--in);letter-spacing:.18em;text-transform:uppercase;transition:background .3s}
 .cf .go:hover{background:var(--ac)}
 #cs{min-height:1.4rem;font-size:.88rem;color:var(--ac)}
+#cs a{color:inherit;text-decoration:underline}
 footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;font-size:.74rem;color:var(--dim);max-width:80rem;margin:0 auto}
 .rv{opacity:0;translate:0 24px;transition:opacity .9s var(--e),translate .9s var(--e);transition-delay:var(--d,0s)}
 .rv.in{opacity:1;translate:0 0}
 #fab{position:fixed;left:1rem;right:1rem;bottom:calc(1rem + env(safe-area-inset-bottom));z-index:45;display:flex;justify-content:center;background:var(--iv);color:#141210;padding:1.05rem;font:500 .7rem/1 var(--in);letter-spacing:.18em;text-transform:uppercase;opacity:0;pointer-events:none;translate:0 1rem;transition:opacity .3s,translate .3s}
 #fab.show{opacity:1;pointer-events:auto;translate:0 0}
 #err{position:fixed;left:0;right:0;bottom:0;z-index:200;background:#000;color:#fff;font:12px/1.5 monospace;padding:8px 12px;display:none;white-space:pre-wrap}
-#ov .hd,#ov .ttl,#ov .man,#ov .pc{opacity:0}
+#ov .hd,#ov .ttl,#ov .man{opacity:0}
 .go #ov .hd{animation:rise 1.4s var(--e) .1s both}
 .go #ov .ttl{animation:rise 1.6s var(--e) .3s both}
 .go #ov .man{animation:rise 1.6s var(--e) .55s both}
-.go #ov .pc{animation:rise 1.6s var(--e) .7s both}
 @keyframes rise{from{opacity:0;transform:translateY(34px)}to{opacity:1;transform:none}}
 
 @media(min-width:700px){
   #ov{padding:2.2rem}
   .nav{gap:1.8rem}
-  .pc{width:240px}
   .fly{bottom:auto;top:50%;translate:0 -50%;left:2rem;width:260px}
   .stage video{
     --kb-a:1.01;
@@ -297,14 +286,9 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
   .sep{display:block}
   .nav{gap:2.2rem}
   .hero{grid-template-columns:repeat(12,1fr);gap:1.5rem}
-  .hero .L{grid-column:1/8}
-  .hero .pc{grid-column:8/13;justify-self:start;max-width:240px;order:0}
+  .hero .L{grid-column:1/9}
   .ttl{font-size:clamp(2.3rem,4.6vw,6.2rem)}
   .man{display:flex}
-  .cap{display:block;margin-bottom:1rem;text-shadow:0 1px 14px #000c}
-  .cap .lb2{font:500 .6rem/1 var(--in);letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
-  .cap h2{font:400 1.2rem/1.25 var(--bd);margin:.4rem 0 .5rem}
-  .cap p{font-size:.68rem;line-height:1.65;color:var(--mut)}
   .gl{display:block}
   .cg{grid-template-columns:1fr 1fr;gap:5rem}
   #fab{left:auto;right:2rem;bottom:2rem;padding:1rem 1.8rem}
@@ -320,7 +304,12 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
 @media(prefers-reduced-motion:reduce){
   .rv{transition:none;opacity:1;translate:none}
   .mq div{animation:none}
-  #ov .hd,#ov .ttl,#ov .man,#ov .pc{opacity:1}
+  #ov .hd,#ov .ttl,#ov .man{opacity:1}
+  .go #ov .hd,.go #ov .ttl,.go #ov .man{
+    animation:none!important;
+    transform:none!important;
+    opacity:1!important;
+  }
   .stage video{
     animation:none;
     transform:scale(var(--kb-a));
@@ -404,22 +393,7 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
             <p data-s=".21,.32">Every piece is made to be worn close to the skin and kept for a lifetime.</p>
           </div>
         </div>
-
-        <!--
-          Hero теперь показывает Sculpture Ring.
-          ring-hero.jpg убран отсюда и остался только внизу в Collection.
-        -->
-        <a class="pc" href="#contact" data-ask="Sculpture Ring">
-          <div class="cap" data-s=".14,.25">
-            <div class="lb2">Sculpture Ring</div>
-            <h2>Sterling Silver Sculpture Ring</h2>
-            <p>One flowing form in sterling silver, polished and brushed. Ready to ship in 7–10 days.</p>
-          </div>
-          <div class="card" data-s=".18,.29">
-            <img src="image/ring-sculpture.jpg" alt="Sculpture Ring in sterling silver">
-          </div>
-          <div class="pr" data-s=".20,.31">$540</div>
-        </a>
+        <!-- Продукт-карточка справа убрана: на её месте теперь пусто, только видео. -->
       </div>
     </div>
 
@@ -486,9 +460,6 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
       <span class="cta">Enquire</span>
     </a>
 
-    <!--
-      Abyssal Ring с ring-hero.jpg теперь показывается только здесь, внизу.
-    -->
     <a class="pcd rv" href="#contact" data-ask="Abyssal Ring" style="--d:.12s">
       <span class="ph"><img src="image/ring-hero.jpg" alt="Abyssal Ring with rough onyx" loading="lazy"></span>
       <span class="nm"><span>Abyssal Ring</span><span>$1,950</span></span>
@@ -581,14 +552,27 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
 
 <a id="fab" href="#contact">Enquire</a>
 
-<script src="lenis.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
 <div id="err"></div>
 
 <script>
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)],cl=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches,eo=x=>1-Math.pow(1-x,3);
+
+/*
+  Если нужны красные ошибки загрузки ассетов внизу экрана, поставь true.
+  Для прода лучше держать false.
+*/
+const DEBUG_ASSETS=false;
 const err=$("#err");
-addEventListener("error",e=>{const t=e.target;if(t&&t.src){err.style.display="block";err.textContent+="Failed to load: "+t.src+"\n"}},true);
+addEventListener("error",e=>{
+  if(!DEBUG_ASSETS)return;
+  const t=e.target;
+  if(t&&t.src){
+    err.style.display="block";
+    err.textContent+="Failed to load: "+t.src+"\n";
+  }
+},true);
 
 const story=$("#story"),pin=$(".pin"),v1=$("#v1"),v2=$("#v2"),bar=$("#bar"),ov=$("#ov"),panel=$("#panel"),fab=$("#fab"),ct=$("#contact");
 const lenis=window.Lenis?new Lenis({lerp:.09,smoothWheel:true}):null;
@@ -786,10 +770,16 @@ $("#back").addEventListener("click",()=>jump(target>=.9?.8:.33));
 
 /*
   enquiries
-  Web3Forms иногда возвращает HTML-страницу:
+
+  Важно: api.web3forms.com/submit иногда возвращает не JSON, а HTML-страницу:
   "Verifying you are human. This may take a few seconds."
   Поэтому нельзя сразу делать response.json().
-  Ниже безопасная обработка + fallback на mailto.
+
+  Ниже:
+  - безопасное чтение ответа как text();
+  - определение страницы human verification;
+  - fallback на mailto;
+  - если Web3Forms заблокирован проверкой, показываем ссылку на письмо.
 */
 const FORM={
   url:"https://api.web3forms.com/submit",
@@ -823,20 +813,37 @@ function isFormConfigured(){
   )
 }
 
-function mailtoFallback(subject,data){
+function mailtoHref(subject,data){
   const body=Object.entries(data)
-    .map(([k,v])=>`${k}: ${v}`)
+    .map(([k,v])=>`${k}: ${v ?? ""}`)
     .join("\n");
 
-  location.href=
+  return(
     `mailto:${FORM.to}`+
     `?subject=${encodeURIComponent(subject)}`+
     `&body=${encodeURIComponent(body)}`
+  )
+}
+
+function openMailto(subject,data){
+  location.href=mailtoHref(subject,data)
+}
+
+function setStatusWithMail(prefix,subject,data){
+  cs.textContent="";
+  cs.append(document.createTextNode(prefix+" "));
+
+  const a=document.createElement("a");
+  a.href=mailtoHref(subject,data);
+  a.textContent="email us directly";
+  cs.append(a);
+
+  cs.append(document.createTextNode("."));
 }
 
 async function send(subject,data){
   if(!isFormConfigured()){
-    mailtoFallback(subject,data);
+    openMailto(subject,data);
     return "mailto"
   }
 
@@ -872,23 +879,16 @@ async function send(subject,data){
       /review the security of your connection/i.test(text);
 
     if(isSecurityCheck){
-      throw new Error("Web3Forms returned a human-verification page.")
+      return "blocked"
     }
 
     if(!res.ok||!json||json.success!==true){
-      throw new Error(json?.message||`HTTP ${res.status}`)
+      return "error"
     }
 
     return "sent"
-  }catch(e){
-    console.warn("Web3Forms submission failed:",e);
-
-    /*
-      Если Web3Forms недоступен или вернул проверку "я не робот",
-      открываем обычное письмо, чтобы заявка не потерялась.
-    */
-    mailtoFallback(subject,data);
-    return "mailto"
+  }catch{
+    return "error"
   }
 }
 
@@ -925,7 +925,20 @@ cf.addEventListener("submit",async e=>{
     return
   }
 
-  cs.textContent="Something went wrong. Please write to "+FORM.to+".";
+  if(result==="blocked"){
+    setStatusWithMail(
+      "The form service is temporarily asking for human verification. Please",
+      subject,
+      f
+    );
+    return
+  }
+
+  setStatusWithMail(
+    "The form could not be sent. Please",
+    subject,
+    f
+  );
 });
 
 const io=new IntersectionObserver(es=>es.forEach(e=>{
