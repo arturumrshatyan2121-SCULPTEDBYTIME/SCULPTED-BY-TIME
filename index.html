@@ -207,7 +207,7 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
 .man p{width:270px;font-size:.72rem;line-height:1.7;color:var(--mut)}
 [data-s]{will-change:opacity,transform}
 
-/* product that arrives from the left */
+/* product that arrives from the left (показывается ОДИН раз за фильм) */
 .fly{position:absolute;z-index:20;left:1rem;bottom:5.5rem;width:46vw;max-width:300px;display:block;opacity:0;pointer-events:none}
 .fly .fi{display:block;transition:opacity .4s var(--e),visibility 0s}
 .fly.gone .fi{opacity:0;visibility:hidden;transition:opacity .35s var(--e),visibility 0s .35s}
@@ -464,22 +464,16 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
       </div>
     </div>
 
+    <!--
+      ЕДИНСТВЕННЫЙ продуктовый акт фильма.
+      Герой = Aura Drop Earrings: согласован с первым видео (на кадре серьга),
+      поэтому карточка не спорит с картинкой. Abyssal Ring остался в коллекции внизу.
+      Второй акт (кольцо в финале) убран по просьбе «продукт один раз, а не два».
+    -->
     <a class="fly" id="fly1" href="#contact" data-ask="Aura Drop Earrings" data-fly=".27,.37,.40">
       <span class="fi">
         <span class="ph"><img src="image/earrings.jpg" alt="Aura Drop Earrings"></span>
         <span class="nm"><span>Aura Drop Earrings</span><span>$3,400</span></span>
-        <span class="mo">View the piece</span>
-      </span>
-    </a>
-
-    <!--
-      Вместо ring-sculpture.jpg теперь ring-hero.jpg.
-      Вместо Sculpture Ring — Abyssal Ring и его характеристики.
-    -->
-    <a class="fly" id="fly2" href="#contact" data-ask="Abyssal Ring" data-fly=".77,.87,.90">
-      <span class="fi">
-        <span class="ph"><img src="image/ring-hero.jpg" alt="Abyssal Ring"></span>
-        <span class="nm"><span>Abyssal Ring</span><span>$1,950</span></span>
         <span class="mo">View the piece</span>
       </span>
     </a>
@@ -707,6 +701,12 @@ Promise.all([
 const ST=$$("[data-s]").map(el=>{const[a,b]=el.dataset.s.split(",").map(Number);return{el,a,b,r:-1}});
 const FL=$$("[data-fly]").map(el=>{const[a,b,h]=el.dataset.fly.split(",").map(Number);return{el,a,b,h,r:-1}});
 
+/*
+  PIECES[0] = герой фильма (показывается один раз в единственной панели).
+  PIECES[1] = Abyssal Ring — резерв: в фильме не крутится (второй акт убран),
+  живёт только в коллекции внизу. Чтобы сделать кольцом ЕДИНСТВЕННЫМ героем,
+  поменяй объекты местами и синхронно поправь fly1 в HTML (data-ask, img, nm, pr).
+*/
 const PIECES=[
   {
     cat:"Aura Drop Earrings",
@@ -799,8 +799,12 @@ function frame(t){
     st.pointerEvents=1-k<.15?"none":""
   }
 
-  /* the product arrives from the left, then opens into the sheet */
-  const open=(p>=.4&&p<.5)||p>=.9,sec=p>=.9;
+  /*
+    ОДИН продуктовый акт: панель открывается только в середине (.4–.5)
+    и всегда показывает PIECES[0]. Ветка p>=.9 (второй продукт) убрана.
+    Вторая половина фильма = молчаливое второе видео + #fab как CTA.
+  */
+  const open=p>=.4&&p<.5,sec=false;
 
   for(const f of FL){
     const k=eo(cl((p-f.a)/(f.b-f.a)));
@@ -837,7 +841,8 @@ requestAnimationFrame(frame);
 addEventListener("touchstart",()=>[v1,v2].forEach(v=>{v.play().then(()=>v.pause()).catch(()=>{})}),{once:true,passive:true});
 
 const jump=f=>goTo(story.getBoundingClientRect().top+scrollY+f*(story.offsetHeight-pin.offsetHeight));
-$("#back").addEventListener("click",()=>jump(target>=.9?.8:.33));
+/* возврат из единственной панели к интро/продукту (ветка .9 больше не нужна) */
+$("#back").addEventListener("click",()=>jump(.33));
 
 /*
   enquiries
