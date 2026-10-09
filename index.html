@@ -11,6 +11,7 @@
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23080807'/%3E%3Ccircle cx='50' cy='50' r='16' fill='none' stroke='%23D2C3A0' stroke-width='5'/%3E%3C/svg%3E">
 <link rel="preload" as="image" href="media/poster-1.jpg">
+<link rel="preload" as="image" href="image/earrings.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -87,6 +88,7 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
   - contrast / brightness / saturate для киношного цвета;
   - медленный Ken Burns, чтобы кадр не выглядел статично;
   - оверлеи ниже (bloom, grade, виньетка, сканлайны).
+  Левая «растворяющая» маска подключается отдельным правилом от 700px.
 */
 .stage video{
   position:absolute;
@@ -112,8 +114,7 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
 
 /*
   Bloom без второго декодера: тёплое свечение в screen по зоне продукта.
-  Высветляет блики металла/камней и сглаживает блоки компрессии,
-  не добавляя нагрузку на скраббинг (поэтому видео-дубли не заведены).
+  Высветляет блики металла/камней и сглаживает блоки компрессии.
 */
 .vbl{
   inset:0;
@@ -206,6 +207,61 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
 .man p{width:270px;font-size:.72rem;line-height:1.7;color:var(--mut)}
 [data-s]{will-change:opacity,transform}
 
+/*
+  Летящая карточка продукта (показывается ОДИН раз за фильм, одна на продукт).
+  Без жёсткой рамки; тёплое свечение вместо прямоугольника; изображение
+  с радиальной маской по краям, чтобы белый студийный фон фото растворялся
+  в тёмном видео, а не лежал наклейкой.
+*/
+.fly{position:absolute;z-index:20;left:1rem;bottom:5.5rem;width:46vw;max-width:300px;display:block;opacity:0;pointer-events:none}
+.fly .fi{display:block;transition:opacity .4s var(--e),visibility 0s}
+.fly.gone .fi{opacity:0;visibility:hidden;transition:opacity .35s var(--e),visibility 0s .35s}
+.fly .ph{
+  display:block;aspect-ratio:4/5;overflow:hidden;border:0;
+  background:radial-gradient(ellipse 90% 90% at 50% 42%, #211f1b, #0b0a08 78%);
+  box-shadow:0 0 0 1px rgba(210,195,160,.10), 0 30px 70px rgba(0,0,0,.6), 0 0 60px rgba(210,195,160,.06);
+  transition:transform .6s var(--e), box-shadow .6s var(--e);
+}
+.fly img{
+  width:100%;height:100%;object-fit:cover;
+  -webkit-mask-image:radial-gradient(ellipse 84% 88% at 50% 46%, #000 58%, transparent 100%);
+  mask-image:radial-gradient(ellipse 84% 88% at 50% 46%, #000 58%, transparent 100%);
+  transition:transform .8s var(--e);
+}
+.fly:hover .ph{transform:translateY(-4px);box-shadow:0 0 0 1px rgba(210,195,160,.16), 0 38px 80px rgba(0,0,0,.65), 0 0 70px rgba(210,195,160,.10)}
+.fly:hover img{transform:scale(1.04)}
+.fly .nm{display:flex;justify-content:space-between;align-items:baseline;gap:.8rem;margin-top:.8rem;font:400 1.05rem/1.2 var(--bd)}
+.fly .nm span:last-child{font:500 .8rem var(--in);color:var(--ac);white-space:nowrap}
+.fly .mo{display:block;margin-top:.45rem;font:500 .6rem/1 var(--in);letter-spacing:.2em;text-transform:uppercase;color:var(--mut)}
+.fly.on{pointer-events:auto}
+
+/* product sheet: left panel on desktop, bottom sheet on phones */
+.panel{position:absolute;z-index:30;background:#F4F1EA;color:#141210;overflow-y:auto;display:flex;flex-direction:column;visibility:hidden;left:0;right:0;bottom:0;max-height:86svh;border-radius:18px 18px 0 0;padding:1.1rem 1.25rem 0;transform:translateY(105%);box-shadow:0 -12px 50px rgba(0,0,0,.4);transition:transform 1.1s var(--e),visibility 0s 1.1s}
+.panel.open{transform:none;visibility:visible;transition:transform 1.1s var(--e),visibility 0s}
+.back{align-self:flex-start;display:flex;align-items:center;gap:.55rem;font:500 .64rem/1 var(--in);letter-spacing:.18em;text-transform:uppercase;color:#141210}
+.back svg{width:15px;height:15px;transition:transform .3s}
+.back:hover svg{transform:translateX(-4px)}
+.pm{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:1rem 0 1.2rem}
+.pm .cat{font:500 .64rem/1 var(--in);letter-spacing:.2em;text-transform:uppercase;color:#8a867d}
+.pm h2{font:400 clamp(1.5rem,6vw,2.4rem)/1.1 var(--bd);margin:.6rem 0 .7rem}
+.pm p{font-size:.78rem;line-height:1.65;color:#6b675f;max-width:400px}
+.pm img{width:100%;max-width:420px;aspect-ratio:16/10;object-fit:cover;margin-top:1.1rem;transition:opacity .3s,scale 1.6s var(--e) .4s;scale:1.08}
+.panel.open .pm img{scale:1}
+.spec{width:100%;max-width:420px;margin-top:1.1rem;border-top:1px solid #e0dcd2;text-align:left}
+.spec div{display:flex;justify-content:space-between;gap:1rem;padding:.6rem 0;border-bottom:1px solid #e0dcd2;font-size:.74rem}
+.spec dt{color:#8a867d;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:.62rem;padding-top:.15rem}
+.spec dd{text-align:right;color:#141210}
+.pm>:not(img){opacity:0;translate:0 24px;transition:opacity .9s var(--e),translate .9s var(--e)}
+.panel.open .pm>:not(img){opacity:1;translate:0 0}
+.panel.open .pm>:nth-child(1){transition-delay:.45s}
+.panel.open .pm>:nth-child(2){transition-delay:.55s}
+.panel.open .pm>:nth-child(3){transition-delay:.65s}
+.panel.open .pm>:nth-child(5){transition-delay:.8s}
+.ft{display:flex;align-items:center;justify-content:space-between;gap:1rem;border-top:1px solid #e0dcd2;margin:0 -1.25rem;padding:.9rem 1.25rem calc(.9rem + env(safe-area-inset-bottom));background:#F4F1EA;position:sticky;bottom:0}
+.ft button{height:48px;background:#141210;color:#F4F1EA;padding:0 1.3rem;font:500 .66rem/1 var(--in);letter-spacing:.16em;text-transform:uppercase;transition:background .3s,color .3s}
+.ft button:hover{background:var(--ac);color:#141210}
+.ft .pr{font:400 1.8rem/1 var(--bd)}
+
 /* after the film */
 .mq{overflow:hidden;border-block:1px solid var(--line);padding:1.3rem 0;white-space:nowrap}
 .mq div{display:inline-flex;width:max-content;animation:mq 46s linear infinite}
@@ -271,11 +327,20 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
 @media(min-width:700px){
   #ov{padding:2.2rem}
   .nav{gap:1.8rem}
+  .fly{bottom:auto;top:50%;translate:0 -50%;left:2rem;width:260px}
   .stage video{
     --kb-a:1.05;
     --kb-b:1.09;
     filter:blur(.36px) contrast(1.20) saturate(.78) brightness(.74);
+    /* «уменьшаем» видео только с левой стороны: левый край растворяется в чёрном */
+    -webkit-mask-image:linear-gradient(to right, transparent 0%, transparent 8%, #000 30%, #000 100%);
+    mask-image:linear-gradient(to right, transparent 0%, transparent 8%, #000 30%, #000 100%);
   }
+  .panel{top:0;left:0;right:auto;bottom:auto;height:100%;max-height:none;width:100%;max-width:600px;border-radius:0;padding:2.2rem 2.2rem 0;transform:translateX(-100%);box-shadow:12px 0 45px rgba(0,0,0,.28)}
+  .panel.open{transform:none}
+  .ft{margin:0 -2.2rem;padding:1.1rem 2.2rem}
+  .pm h2{font-size:clamp(1.7rem,2.6vw,2.4rem)}
+  .pm img{aspect-ratio:4/3}
   .cols{grid-template-columns:1fr 1fr;gap:3rem}
   .pil{grid-template-columns:repeat(3,1fr);gap:2rem}
   .gal{grid-template-columns:repeat(3,1fr);gap:1.6rem}
@@ -288,6 +353,7 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
     --kb-a:1.12;
     --kb-b:1.18;
     filter:blur(.58px) contrast(1.26) saturate(.72) brightness(.68);
+    /* на узком экране левую маску не даём, чтобы не обрезать объект */
   }
 }
 
@@ -304,11 +370,14 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
   .gl{display:block}
   .cg{grid-template-columns:1fr 1fr;gap:5rem}
   #fab{left:auto;right:2rem;bottom:2rem;padding:1rem 1.8rem}
-  /* на больших экранах 720p режем кропом, а не растягиваем в мыло */
+  .fly{left:3rem;width:300px}
+  /* на больших экранах 720p режем кропом + сильнее растворяем слева под карточку */
   .stage video{
     --kb-a:1.13;
     --kb-b:1.19;
     filter:blur(.5px) contrast(1.22) saturate(.76) brightness(.72);
+    -webkit-mask-image:linear-gradient(to right, transparent 0%, transparent 12%, #000 36%, #000 100%);
+    mask-image:linear-gradient(to right, transparent 0%, transparent 12%, #000 36%, #000 100%);
   }
 }
 
@@ -416,6 +485,50 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
         </div>
       </div>
     </div>
+
+    <!--
+      Две летящие карточки, каждая = ОДИН продукт, окна не пересекаются.
+      fly1 серьги (.27-.40) -> панель показывает серьги (.4-.5).
+      fly2 кольцо Abyssal (.77-.90) -> панель показывает кольцо (>=.9).
+      Превью слева всегда согласовано с листом: продукт не мелькает дважды.
+    -->
+    <a class="fly" id="fly1" href="#contact" data-ask="Aura Drop Earrings" data-fly=".27,.37,.40">
+      <span class="fi">
+        <span class="ph"><img src="image/earrings.jpg" alt="Aura Drop Earrings"></span>
+        <span class="nm"><span>Aura Drop Earrings</span><span>$3,400</span></span>
+        <span class="mo">View the piece</span>
+      </span>
+    </a>
+
+    <a class="fly" id="fly2" href="#contact" data-ask="Abyssal Ring" data-fly=".77,.87,.90">
+      <span class="fi">
+        <span class="ph"><img src="image/ring-hero.jpg" alt="Abyssal Ring"></span>
+        <span class="nm"><span>Abyssal Ring</span><span>$1,950</span></span>
+        <span class="mo">View the piece</span>
+      </span>
+    </a>
+
+    <aside class="panel" id="panel" aria-label="Featured piece" aria-hidden="true">
+      <button class="back" id="back" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M19 12H5M11 6l-6 6 6 6"/>
+        </svg>
+        Back to the film
+      </button>
+
+      <div class="pm">
+        <span class="cat" id="pcat"></span>
+        <h2 id="ptit"></h2>
+        <p id="pdesc"></p>
+        <img id="pimg" alt="">
+        <dl class="spec" id="pspec"></dl>
+      </div>
+
+      <div class="ft">
+        <button id="pask" type="button">Enquire about this piece</button>
+        <span class="pr" id="ppr"></span>
+      </div>
+    </aside>
   </div>
 </section>
 
@@ -539,7 +652,7 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
 
 <script>
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)],cl=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
-const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches,eo=x=>1-Math.pow(1-x,3);
 
 /*
   Если нужны красные ошибки загрузки ассетов внизу экрана, поставь true.
@@ -556,7 +669,7 @@ addEventListener("error",e=>{
   }
 },true);
 
-const story=$("#story"),pin=$(".pin"),v1=$("#v1"),v2=$("#v2"),bar=$("#bar"),ov=$("#ov"),fab=$("#fab"),ct=$("#contact");
+const story=$("#story"),pin=$(".pin"),v1=$("#v1"),v2=$("#v2"),bar=$("#bar"),ov=$("#ov"),panel=$("#panel"),fab=$("#fab"),ct=$("#contact");
 const lenis=window.Lenis?new Lenis({lerp:.09,smoothWheel:true}):null;
 if(lenis)lenis.stop();else document.body.style.overflow="hidden";
 
@@ -616,8 +729,58 @@ Promise.all([
 });
 
 const ST=$$("[data-s]").map(el=>{const[a,b]=el.dataset.s.split(",").map(Number);return{el,a,b,r:-1}});
+const FL=$$("[data-fly]").map(el=>{const[a,b,h]=el.dataset.fly.split(",").map(Number);return{el,a,b,h,r:-1}});
 
-let target=0,cur=0,c1=0,c2=0;
+/* PIECES[0] = серьги (первый акт), PIECES[1] = Abyssal (второй акт). Каждый один раз. */
+const PIECES=[
+  {
+    cat:"Aura Drop Earrings",
+    title:"18K White Gold & Pink Sapphire",
+    price:3400,
+    img:"image/earrings.jpg",
+    desc:"Drop earrings in 18K white gold. Each carries an oval pink sapphire in a halo of brilliant-cut diamonds, finished with a pear-cut sapphire drop.",
+    spec:[
+      ["Metal","18K white gold"],
+      ["Stones","Pink sapphires 1.2 ct, diamonds 0.5 ct"],
+      ["Drop length","32 mm"],
+      ["Made","To order, 3–4 weeks"]
+    ]
+  },
+  {
+    cat:"Abyssal Ring",
+    title:"18K White Gold & Rough Onyx",
+    price:1950,
+    img:"image/ring-hero.jpg",
+    desc:"A raw, uncut onyx set in a hand-hammered 18K white gold band. No two stones are alike.",
+    spec:[
+      ["Metal","18K white gold"],
+      ["Stone","Rough black onyx"],
+      ["Band","Hand-hammered"],
+      ["Made","To order, 3–4 weeks"]
+    ]
+  }
+];
+
+PIECES.forEach(p=>{const i=new Image();i.src=p.img});
+
+let target=0,cur=0,c1=0,c2=0,second=null,lastOpen=false;
+
+function setPiece(s){
+  const p=PIECES[s?1:0],img=$("#pimg");
+  img.style.opacity=0;
+  setTimeout(()=>{
+    $("#pcat").textContent=p.cat;
+    $("#ptit").textContent=p.title;
+    $("#pdesc").textContent=p.desc;
+    $("#ppr").textContent="$"+p.price.toLocaleString("en-US");
+    img.src=p.img;
+    img.alt=p.title;
+    img.style.opacity=1;
+    panel.dataset.piece=p.cat;
+    $("#pspec").innerHTML=p.spec.map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")
+  },second===null?0:260);
+  second=s
+}
 
 function scrub(v,ratio,c){
   if(!v.duration||!isFinite(v.duration))return c;
@@ -661,11 +824,35 @@ function frame(t){
     st.pointerEvents=1-k<.15?"none":""
   }
 
+  /* два продукта, каждый один раз: акт1 .4-.5 (серьги), акт2 >=.9 (кольцо) */
+  const open=(p>=.4&&p<.5)||p>=.9,sec=p>=.9;
+
+  for(const f of FL){
+    const k=eo(cl((p-f.a)/(f.b-f.a)));
+    if(Math.abs(k-f.r)<.001&&f.g===(p>=f.h))continue;
+    f.r=k;
+    f.g=p>=f.h;
+    const st=f.el.style;
+    st.opacity=k;
+    st.transform=`translate3d(${-(1-k)*120}%,0,0)`;
+    f.el.classList.toggle("gone",p>=f.h);
+    f.el.classList.toggle("on",k>.9&&p<f.h)
+  }
+
   const hide=p>=.45;
   ov.style.visibility=hide?"hidden":"visible";
   ov.style.pointerEvents=hide?"none":"";
 
-  fab.classList.toggle("show",p>.12&&ct.getBoundingClientRect().top>innerHeight*.9);
+  if(open!==lastOpen){
+    lastOpen=open;
+    panel.classList.toggle("open",open);
+    panel.setAttribute("aria-hidden",!open)
+  }
+
+  if(open&&sec!==second)setPiece(sec);
+  else if(second===null)setPiece(false);
+
+  fab.classList.toggle("show",!open&&p>.12&&ct.getBoundingClientRect().top>innerHeight*.9);
 
   requestAnimationFrame(frame)
 }
@@ -673,6 +860,9 @@ requestAnimationFrame(frame);
 
 /* iOS only seeks a video after a touch */
 addEventListener("touchstart",()=>[v1,v2].forEach(v=>{v.play().then(()=>v.pause()).catch(()=>{})}),{once:true,passive:true});
+
+const jump=f=>goTo(story.getBoundingClientRect().top+scrollY+f*(story.offsetHeight-pin.offsetHeight));
+$("#back").addEventListener("click",()=>jump(target>=.9?.8:.33));
 
 /*
   enquiries
@@ -705,6 +895,11 @@ function askFor(v){
 }
 
 $$("[data-ask]").forEach(a=>a.addEventListener("click",()=>askFor(a.dataset.ask)));
+
+$("#pask").addEventListener("click",()=>{
+  askFor(panel.dataset.piece||"Private viewing");
+  goTo(ct)
+});
 
 function isFormConfigured(){
   return Boolean(
