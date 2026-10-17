@@ -52,8 +52,7 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
 
 /*
   Живое зерно. Элемент расширен за вьюпорт (inset:-20%), чтобы тряска
-  позицией не оголяла края экрана. Дёргаем позицию резкими шагами —
-  это имитирует шум плёнки и маскирует компрессию/блочность кадров.
+  позицией не оголяла края экрана.
 */
 .grain{
   position:fixed;
@@ -82,39 +81,46 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
 .stage{position:absolute;inset:0;z-index:0;pointer-events:none}
 
 /*
-  Кадры из ZIP вместо видео: визуально улучшаем их так же, как раньше видео:
-  - увеличение, чтобы обрезать растянутые края и артефакты;
-  - мягкий blur против квадратных блоков;
-  - contrast / brightness / saturate для киношного цвета;
-  - медленный Ken Burns, чтобы кадр не выглядел статично;
-  - оверлеи ниже (bloom, grade, виньетка, сканлайны).
-  Левая «растворяющая» маска подключается отдельным правилом от 700px.
+  КАК В БУРГЕР-ЛЕНДИНГЕ: кадр из ZIP лежит не на весь экран, а в
+  центрированной «рамке» уменьшенного масштаба (86% x 72% сцены).
+  Края рамки растворяет маска, сверху давит виньетка, за рамкой —
+  тёплое свечение. Push-in (ken burns) сделан почти незаметным.
 */
-.stage canvas{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  display:block;
-  opacity:0;
-  --kb-a:1.09;
-  --kb-b:1.14;
+.fglow{
+  position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 46% 40% at 50% 50%,rgba(210,195,160,.14),transparent 70%);
+  animation:breathe 7s ease-in-out infinite;
+}
+@keyframes breathe{0%,100%{opacity:.75}50%{opacity:1}}
+
+.frame{
+  position:absolute;left:50%;top:50%;translate:-50% -50%;
+  z-index:1;will-change:transform;
+  --kb-a:1;--kb-b:1.035;
   transform:scale(var(--kb-a));
-  filter:blur(.48px) contrast(1.24) saturate(.74) brightness(.70);
-  transition:opacity .7s ease-in-out;
-  will-change:opacity,transform,filter;
   animation:kenburns 32s ease-in-out infinite alternate;
 }
 @keyframes kenburns{
   from{transform:scale(var(--kb-a))}
   to{transform:scale(var(--kb-b))}
 }
+.frame canvas{
+  display:block;width:100%;height:100%;
+  opacity:0;
+  filter:blur(.48px) contrast(1.24) saturate(.74) brightness(.70);
+  transition:opacity .7s ease-in-out;
+  will-change:opacity,filter;
+  /* растворение краёв кадра, как в бургере: по горизонтали и вертикали */
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 15%,#000 85%,transparent),linear-gradient(to bottom,transparent,#000 4%,#000 88%,transparent);
+  -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(to right,transparent,#000 15%,#000 85%,transparent),linear-gradient(to bottom,transparent,#000 4%,#000 88%,transparent);
+  mask-composite:intersect;
+}
 
 .vg,.gt,.gb,.gl,.gc,.vb,.vs,.vbl{position:absolute;pointer-events:none}
 
 /*
-  Bloom: тёплое свечение в screen по зоне продукта.
-  Высветляет блики металла/камней и сглаживает блоки компрессии.
+  Bloom без второго декодера: тёплое свечение в screen по зоне продукта.
 */
 .vbl{
   inset:0;
@@ -128,19 +134,18 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
   opacity:.6;
 }
 
-/* более глубокая виньетка */
+/* ВИНЬЕТКА КАК В БУРГЕР-ЛЕНДИНГЕ: центр открыт, края глубоко гаснут */
 .vg{
   inset:0;
   background:radial-gradient(
-    ellipse 68% 72% at 58% 50%,
-    transparent 20%,
-    rgba(0,0,0,.46) 58%,
-    rgba(0,0,0,.86) 86%,
-    #000 100%
+    ellipse 74% 70% at 50% 50%,
+    transparent 42%,
+    rgba(0,0,0,.6) 78%,
+    rgba(0,0,0,.92) 100%
   )
 }
 
-/* тёплый/холодный киношный градиент поверх кадров */
+/* тёплый/холодный киношный градиент поверх кадра */
 .gc{
   inset:0;
   background:linear-gradient(
@@ -166,7 +171,7 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
   opacity:.58;
 }
 
-/* очень тонкая текстура, имитирующая плёнку (приглушена против полос) */
+/* очень тонкая текстура, имитирующая плёнку */
 .vs{
   inset:0;
   background-image:
@@ -199,19 +204,16 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
 .enq i{width:6px;height:6px;border-radius:50%;background:var(--ac);animation:pulse 2s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(210,195,160,.55)}70%,100%{box-shadow:0 0 0 8px transparent}}
 .hero{display:grid;grid-template-columns:1fr;gap:1.2rem;align-items:end}
-.ttl{font:400 clamp(2rem,9.6vw,3.8rem)/.98 var(--bd);letter-spacing:-.015em;text-transform:uppercase;white-space:nowrap;color:var(--iv)}
+.ttl{font:400 clamp(2rem,9.6vw,3.8rem)/.98 var(--bd);letter-spacing:-.015em;text-transform:uppercase;white-space:nowrap;color:var(--iv);text-shadow:0 2px 24px rgba(0,0,0,.8)}
 .ttl div{display:block}
 .ttl em{font-style:italic;text-transform:none;letter-spacing:-.02em}
 .ttl .in1{padding-left:.8em}
 .man{display:none;gap:1.2rem;margin-top:1.6rem}
-.man p{width:270px;font-size:.72rem;line-height:1.7;color:var(--mut)}
+.man p{width:270px;font-size:.72rem;line-height:1.7;color:var(--mut);text-shadow:0 1px 14px rgba(0,0,0,.8)}
 [data-s]{will-change:opacity,transform}
 
 /*
   Летящая карточка продукта (показывается ОДИН раз за фильм, одна на продукт).
-  Без жёсткой рамки; тёплое свечение вместо прямоугольника; изображение
-  с радиальной маской по краям, чтобы белый студийный фон фото растворялся
-  в тёмном видео, а не лежал наклейкой.
 */
 .fly{position:absolute;z-index:20;left:1rem;bottom:5.5rem;width:46vw;max-width:300px;display:block;opacity:0;pointer-events:none}
 .fly .fi{display:block;transition:opacity .4s var(--e),visibility 0s}
@@ -328,14 +330,6 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
   #ov{padding:2.2rem}
   .nav{gap:1.8rem}
   .fly{bottom:auto;top:50%;translate:0 -50%;left:2rem;width:260px}
-  .stage canvas{
-    --kb-a:1.05;
-    --kb-b:1.09;
-    filter:blur(.36px) contrast(1.20) saturate(.78) brightness(.74);
-    /* «уменьшаем» кадр только с левой стороны: левый край растворяется в чёрном */
-    -webkit-mask-image:linear-gradient(to right, transparent 0%, transparent 8%, #000 30%, #000 100%);
-    mask-image:linear-gradient(to right, transparent 0%, transparent 8%, #000 30%, #000 100%);
-  }
   .panel{top:0;left:0;right:auto;bottom:auto;height:100%;max-height:none;width:100%;max-width:600px;border-radius:0;padding:2.2rem 2.2rem 0;transform:translateX(-100%);box-shadow:12px 0 45px rgba(0,0,0,.28)}
   .panel.open{transform:none}
   .ft{margin:0 -2.2rem;padding:1.1rem 2.2rem}
@@ -346,15 +340,6 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
   .gal{grid-template-columns:repeat(3,1fr);gap:1.6rem}
   .sec{padding:6.5rem 2.2rem}
   footer{padding:1.8rem 2.2rem}
-}
-
-@media(max-width:699px){
-  .stage canvas{
-    --kb-a:1.12;
-    --kb-b:1.18;
-    filter:blur(.58px) contrast(1.26) saturate(.72) brightness(.68);
-    /* на узком экране левую маску не даём, чтобы не обрезать объект */
-  }
 }
 
 @media(min-width:980px){
@@ -371,14 +356,6 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
   .cg{grid-template-columns:1fr 1fr;gap:5rem}
   #fab{left:auto;right:2rem;bottom:2rem;padding:1rem 1.8rem}
   .fly{left:3rem;width:300px}
-  /* на больших экранах режем кропом + сильнее растворяем слева под карточку */
-  .stage canvas{
-    --kb-a:1.13;
-    --kb-b:1.19;
-    filter:blur(.5px) contrast(1.22) saturate(.76) brightness(.72);
-    -webkit-mask-image:linear-gradient(to right, transparent 0%, transparent 12%, #000 36%, #000 100%);
-    mask-image:linear-gradient(to right, transparent 0%, transparent 12%, #000 36%, #000 100%);
-  }
 }
 
 @media(min-width:980px) and (max-height:780px){
@@ -391,15 +368,15 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
   .rv{transition:none;opacity:1;translate:none}
   .mq div{animation:none}
   .grain{animation:none}
+  .fglow{animation:none}
+  .frame{animation:none;transform:none}
   #ov .hd,#ov .ttl,#ov .man{opacity:1}
   .go #ov .hd,.go #ov .ttl,.go #ov .man{
     animation:none!important;
     transform:none!important;
     opacity:1!important;
   }
-  .stage canvas{
-    animation:none;
-    transform:scale(var(--kb-a));
+  .frame canvas{
     filter:blur(.22px) contrast(1.14) saturate(.84) brightness(.80);
   }
 }
@@ -427,9 +404,12 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
 <section id="story" aria-label="Aurelle — Sculpted by Time">
   <div class="pin">
     <div class="stage" aria-hidden="true">
-      <!-- кадры из ZIP вместо видео: акт 1 и акт 2 -->
-      <canvas id="v1" data-poster="media/poster-1.jpg"></canvas>
-      <canvas id="v2" data-poster="media/poster-2.jpg"></canvas>
+      <div class="fglow"></div>
+      <!-- кадр из ZIP в центрированной рамке уменьшенного масштаба -->
+      <div class="frame" id="frame">
+        <canvas id="v1" data-poster="media/poster-1.jpg"></canvas>
+        <canvas id="v2" data-poster="media/poster-2.jpg"></canvas>
+      </div>
       <div class="vbl"></div>
       <div class="vb"></div>
       <div class="gc"></div>
@@ -489,9 +469,6 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
 
     <!--
       Две летящие карточки, каждая = ОДИН продукт, окна не пересекаются.
-      fly1 серьги (.27-.40) -> панель показывает серьги (.4-.5).
-      fly2 кольцо Abyssal (.77-.90) -> панель показывает кольцо (>=.9).
-      Превью слева всегда согласовано с листом: продукт не мелькает дважды.
     -->
     <a class="fly" id="fly1" href="#contact" data-ask="Aura Drop Earrings" data-fly=".27,.37,.40">
       <span class="fi">
@@ -674,11 +651,12 @@ addEventListener("error",e=>{
 /*
   Кадры из ZIP вместо видео (как в бургер-странице).
   ZIPS[0] = акт 1, ZIPS[1] = акт 2.
-  Если акты поменяны местами — просто поменяй местами эти две строки.
+  Файлы ПОМЕНЯНЫ МЕСТАМИ: теперь акт 1 = 4681..., акт 2 = 4220...
+  Если нужно вернуть прежний порядок — просто поменяй строки обратно.
 */
 const ZIPS=[
-  ["ezgif-4220f3e941682612-jpg.zip","media/ezgif-4220f3e941682612-jpg.zip"],
-  ["ezgif-4681c7f56362fb94-jpg.zip","media/ezgif-4681c7f56362fb94-jpg.zip"]
+  ["ezgif-4681c7f56362fb94-jpg.zip","media/ezgif-4681c7f56362fb94-jpg.zip"],
+  ["ezgif-4220f3e941682612-jpg.zip","media/ezgif-4220f3e941682612-jpg.zip"]
 ];
 
 const story=$("#story"),pin=$(".pin"),bar=$("#bar"),ov=$("#ov"),panel=$("#panel"),fab=$("#fab"),ct=$("#contact");
@@ -702,12 +680,34 @@ const num=n=>{const b=String(n).split("/").pop();const m=b.match(/(\d+)(?=\.[a-z
 const mkFilm=cv=>({cv,ctx:cv.getContext("2d"),frames:[],poster:null,last:-1});
 const films=[mkFilm($("#v1")),mkFilm($("#v2"))];
 
+/*
+  Рамка кадра, как в бургер-лендинге: центрированный бокс уменьшенного
+  масштаба (86% ширины / 72% высоты сцены), пропорции берём из кадра.
+*/
+const frameBox=$("#frame");
+function frameAspect(){
+  for(const f of films){
+    const im=f.frames[0]||f.poster;
+    if(im&&im.naturalWidth)return im.naturalWidth/im.naturalHeight
+  }
+  return 16/9
+}
+function layout(){
+  const sw=pin.clientWidth,sh=pin.clientHeight,ar=frameAspect();
+  const maxW=sw*.86,maxH=sh*.72;
+  let W=maxW,H=W/ar;
+  if(H>maxH){H=maxH;W=H*ar}
+  frameBox.style.width=W+"px";
+  frameBox.style.height=H+"px";
+}
+layout();
+
 function sizeFilm(f){
   const dpr=Math.min(devicePixelRatio||1,2);
   const w=Math.max(1,Math.round(f.cv.clientWidth*dpr)),h=Math.max(1,Math.round(f.cv.clientHeight*dpr));
   if(f.cv.width!==w||f.cv.height!==h){f.cv.width=w;f.cv.height=h;}
 }
-/* cover-кадрирование: кадр заполняет экран, как object-fit:cover у видео */
+/* cover-кадрирование: кадр заполняет рамку, как object-fit:cover */
 function drawFrame(f,i){
   const im=f.frames[i]||f.poster;
   if(!im||!im.naturalWidth)return;
@@ -771,6 +771,7 @@ Promise.all([
   loadZipFilm(films[1],ZIPS[1],1),
   new Promise(r=>setTimeout(r,1200))
 ]).then(()=>{
+  layout();
   drawFrame(films[0],0);
   drawFrame(films[1],0);
   $("#ld").classList.add("done");
@@ -779,7 +780,10 @@ Promise.all([
   setTimeout(()=>$("#ld").remove(),1200)
 });
 
-addEventListener("resize",()=>{films.forEach(f=>{if(f.last>=0)drawFrame(f,f.last);});});
+addEventListener("resize",()=>{
+  layout();
+  films.forEach(f=>{if(f.last>=0)drawFrame(f,f.last);});
+});
 
 const ST=$$("[data-s]").map(el=>{const[a,b]=el.dataset.s.split(",").map(Number);return{el,a,b,r:-1}});
 const FL=$$("[data-fly]").map(el=>{const[a,b,h]=el.dataset.fly.split(",").map(Number);return{el,a,b,h,r:-1}});
@@ -922,12 +926,6 @@ $("#back").addEventListener("click",()=>jump(target>=.9?.8:.33));
   Важно: api.web3forms.com/submit иногда возвращает не JSON, а HTML-страницу:
   "Verifying you are human. This may take a few seconds."
   Поэтому нельзя сразу делать response.json().
-
-  Ниже:
-  - безопасное чтение ответа как text();
-  - определение страницы human verification;
-  - fallback на mailto;
-  - если Web3Forms заблокирован проверкой, показываем ссылку на письмо.
 */
 const FORM={
   url:"https://api.web3forms.com/submit",
