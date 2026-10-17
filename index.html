@@ -53,7 +53,7 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
 /*
   Живое зерно. Элемент расширен за вьюпорт (inset:-20%), чтобы тряска
   позицией не оголяла края экрана. Дёргаем позицию резкими шагами —
-  это имитирует шум плёнки и маскирует компрессию/блочность 720p.
+  это имитирует шум плёнки и маскирует компрессию/блочность кадров.
 */
 .grain{
   position:fixed;
@@ -82,7 +82,7 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
 .stage{position:absolute;inset:0;z-index:0;pointer-events:none}
 
 /*
-  Видео нельзя заменить, поэтому визуально улучшаем его:
+  Кадры из ZIP вместо видео: визуально улучшаем их так же, как раньше видео:
   - увеличение, чтобы обрезать растянутые края и артефакты;
   - мягкий blur против квадратных блоков;
   - contrast / brightness / saturate для киношного цвета;
@@ -90,12 +90,12 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
   - оверлеи ниже (bloom, grade, виньетка, сканлайны).
   Левая «растворяющая» маска подключается отдельным правилом от 700px.
 */
-.stage video{
+.stage canvas{
   position:absolute;
   inset:0;
   width:100%;
   height:100%;
-  object-fit:cover;
+  display:block;
   opacity:0;
   --kb-a:1.09;
   --kb-b:1.14;
@@ -113,7 +113,7 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
 .vg,.gt,.gb,.gl,.gc,.vb,.vs,.vbl{position:absolute;pointer-events:none}
 
 /*
-  Bloom без второго декодера: тёплое свечение в screen по зоне продукта.
+  Bloom: тёплое свечение в screen по зоне продукта.
   Высветляет блики металла/камней и сглаживает блоки компрессии.
 */
 .vbl{
@@ -140,7 +140,7 @@ button,input,select,textarea{font:inherit;color:inherit;background:none;border:0
   )
 }
 
-/* тёплый/холодный киношный градиент поверх видео */
+/* тёплый/холодный киношный градиент поверх кадров */
 .gc{
   inset:0;
   background:linear-gradient(
@@ -328,11 +328,11 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
   #ov{padding:2.2rem}
   .nav{gap:1.8rem}
   .fly{bottom:auto;top:50%;translate:0 -50%;left:2rem;width:260px}
-  .stage video{
+  .stage canvas{
     --kb-a:1.05;
     --kb-b:1.09;
     filter:blur(.36px) contrast(1.20) saturate(.78) brightness(.74);
-    /* «уменьшаем» видео только с левой стороны: левый край растворяется в чёрном */
+    /* «уменьшаем» кадр только с левой стороны: левый край растворяется в чёрном */
     -webkit-mask-image:linear-gradient(to right, transparent 0%, transparent 8%, #000 30%, #000 100%);
     mask-image:linear-gradient(to right, transparent 0%, transparent 8%, #000 30%, #000 100%);
   }
@@ -349,7 +349,7 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
 }
 
 @media(max-width:699px){
-  .stage video{
+  .stage canvas{
     --kb-a:1.12;
     --kb-b:1.18;
     filter:blur(.58px) contrast(1.26) saturate(.72) brightness(.68);
@@ -371,8 +371,8 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
   .cg{grid-template-columns:1fr 1fr;gap:5rem}
   #fab{left:auto;right:2rem;bottom:2rem;padding:1rem 1.8rem}
   .fly{left:3rem;width:300px}
-  /* на больших экранах 720p режем кропом + сильнее растворяем слева под карточку */
-  .stage video{
+  /* на больших экранах режем кропом + сильнее растворяем слева под карточку */
+  .stage canvas{
     --kb-a:1.13;
     --kb-b:1.19;
     filter:blur(.5px) contrast(1.22) saturate(.76) brightness(.72);
@@ -397,7 +397,7 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
     transform:none!important;
     opacity:1!important;
   }
-  .stage video{
+  .stage canvas{
     animation:none;
     transform:scale(var(--kb-a));
     filter:blur(.22px) contrast(1.14) saturate(.84) brightness(.80);
@@ -427,8 +427,9 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
 <section id="story" aria-label="Aurelle — Sculpted by Time">
   <div class="pin">
     <div class="stage" aria-hidden="true">
-      <video id="v1" poster="media/poster-1.jpg" muted playsinline preload="auto"></video>
-      <video id="v2" poster="media/poster-2.jpg" muted playsinline preload="auto"></video>
+      <!-- кадры из ZIP вместо видео: акт 1 и акт 2 -->
+      <canvas id="v1" data-poster="media/poster-1.jpg"></canvas>
+      <canvas id="v2" data-poster="media/poster-2.jpg"></canvas>
       <div class="vbl"></div>
       <div class="vb"></div>
       <div class="gc"></div>
@@ -648,6 +649,7 @@ footer{border-top:1px solid var(--line);padding:1.8rem 1.25rem calc(1.8rem + env
 <a id="fab" href="#contact">Enquire</a>
 
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <div id="err"></div>
 
 <script>
@@ -669,7 +671,17 @@ addEventListener("error",e=>{
   }
 },true);
 
-const story=$("#story"),pin=$(".pin"),v1=$("#v1"),v2=$("#v2"),bar=$("#bar"),ov=$("#ov"),panel=$("#panel"),fab=$("#fab"),ct=$("#contact");
+/*
+  Кадры из ZIP вместо видео (как в бургер-странице).
+  ZIPS[0] = акт 1, ZIPS[1] = акт 2.
+  Если акты поменяны местами — просто поменяй местами эти две строки.
+*/
+const ZIPS=[
+  ["ezgif-4220f3e941682612-jpg.zip","media/ezgif-4220f3e941682612-jpg.zip"],
+  ["ezgif-4681c7f56362fb94-jpg.zip","media/ezgif-4681c7f56362fb94-jpg.zip"]
+];
+
+const story=$("#story"),pin=$(".pin"),bar=$("#bar"),ov=$("#ov"),panel=$("#panel"),fab=$("#fab"),ct=$("#contact");
 const lenis=window.Lenis?new Lenis({lerp:.09,smoothWheel:true}):null;
 if(lenis)lenis.stop();else document.body.style.overflow="hidden";
 
@@ -685,48 +697,89 @@ document.addEventListener("click",e=>{
   if(t)goTo(t)
 });
 
+/* ---------- films: canvas + frames from zip ---------- */
+const num=n=>{const b=String(n).split("/").pop();const m=b.match(/(\d+)(?=\.[a-z0-9]+$)/i);if(m)return parseInt(m[1],10);const a=b.match(/\d+/g);return a?parseInt(a[a.length-1],10):0;};
+const mkFilm=cv=>({cv,ctx:cv.getContext("2d"),frames:[],poster:null,last:-1});
+const films=[mkFilm($("#v1")),mkFilm($("#v2"))];
+
+function sizeFilm(f){
+  const dpr=Math.min(devicePixelRatio||1,2);
+  const w=Math.max(1,Math.round(f.cv.clientWidth*dpr)),h=Math.max(1,Math.round(f.cv.clientHeight*dpr));
+  if(f.cv.width!==w||f.cv.height!==h){f.cv.width=w;f.cv.height=h;}
+}
+/* cover-кадрирование: кадр заполняет экран, как object-fit:cover у видео */
+function drawFrame(f,i){
+  const im=f.frames[i]||f.poster;
+  if(!im||!im.naturalWidth)return;
+  sizeFilm(f);
+  const cw=f.cv.width,ch=f.cv.height,iw=im.naturalWidth,ih=im.naturalHeight;
+  const s=Math.max(cw/iw,ch/ih),dw=iw*s,dh=ih*s;
+  f.ctx.drawImage(im,(cw-dw)/2,(ch-dh)/2,dw,dh);
+}
+
 /* both films are loaded into memory first, so scrubbing never waits on the network */
 const lp=[0,0],lbar=$("#lbar"),lpc=$("#lpc");
 const setL=()=>{const v=(lp[0]+lp[1])/2;lbar.style.scale=v+" 1";lpc.textContent=Math.round(v*100)+"%"};
 
-async function load(v,url,i){
-  try{
-    const r=await fetch(url);
-    if(!r.ok)throw 0;
-    const total=+r.headers.get("content-length")||0,rd=r.body.getReader(),ch=[];
-    let got=0;
-    for(;;){
-      const{done,value}=await rd.read();
-      if(done)break;
-      ch.push(value);
-      got+=value.length;
-      lp[i]=total?got/total:.5;
-      setL()
+async function loadZipFilm(f,urls,i){
+  if(window.JSZip){
+    for(const u of urls){
+      try{
+        const r=await fetch(u);
+        if(!r.ok)throw 0;
+        const total=+r.headers.get("content-length")||0,rd=r.body.getReader(),ch=[];
+        let got=0;
+        for(;;){
+          const{done,value}=await rd.read();
+          if(done)break;
+          ch.push(value);
+          got+=value.length;
+          lp[i]=total?(got/total)*.45:.2;
+          setL()
+        }
+        const zip=await JSZip.loadAsync(new Blob(ch));
+        const es=Object.values(zip.files).filter(e=>!e.dir&&/\.(jpe?g|png|webp)$/i.test(e.name)&&!/__MACOSX|\.DS_Store|thumbs\.db/i.test(e.name));
+        if(!es.length)throw 0;
+        es.sort((a,b)=>num(a.name)-num(b.name)||a.name.localeCompare(b.name,undefined,{numeric:true}));
+        let done=0;
+        f.frames=await Promise.all(es.map(async e=>{
+          const blob=await e.async("blob");
+          const im=new Image();
+          im.decoding="async";
+          await new Promise(res=>{im.onload=res;im.onerror=res;im.src=URL.createObjectURL(blob);});
+          done++;
+          lp[i]=.45+(done/es.length)*.55;
+          setL();
+          return im;
+        }));
+        lp[i]=1;setL();
+        return true;
+      }catch(e){/* пробуем следующий путь */}
     }
-    v.src=URL.createObjectURL(new Blob(ch,{type:"video/mp4"}))
-  }catch{
-    v.src=url
   }
-  await new Promise(res=>{
-    if(v.readyState>=2)return res();
-    v.addEventListener("loadeddata",res,{once:true});
-    v.addEventListener("error",res,{once:true});
-    setTimeout(res,2500)
-  });
-  lp[i]=1;
-  setL()
+  /* fallback: постер как одиночный кадр, чтобы сцена не осталась чёрной */
+  const im=new Image();
+  await new Promise(res=>{im.onload=res;im.onerror=res;im.src=f.cv.dataset.poster||"";});
+  f.poster=im;
+  f.frames=[im];
+  lp[i]=1;setL();
+  return false;
 }
 
 Promise.all([
-  load(v1,"media/video-1.mp4",0),
-  load(v2,"media/video-2.mp4",1),
+  loadZipFilm(films[0],ZIPS[0],0),
+  loadZipFilm(films[1],ZIPS[1],1),
   new Promise(r=>setTimeout(r,1200))
 ]).then(()=>{
+  drawFrame(films[0],0);
+  drawFrame(films[1],0);
   $("#ld").classList.add("done");
   document.body.classList.add("go");
   lenis?lenis.start():document.body.style.overflow="";
   setTimeout(()=>$("#ld").remove(),1200)
 });
+
+addEventListener("resize",()=>{films.forEach(f=>{if(f.last>=0)drawFrame(f,f.last);});});
 
 const ST=$$("[data-s]").map(el=>{const[a,b]=el.dataset.s.split(",").map(Number);return{el,a,b,r:-1}});
 const FL=$$("[data-fly]").map(el=>{const[a,b,h]=el.dataset.fly.split(",").map(Number);return{el,a,b,h,r:-1}});
@@ -782,11 +835,13 @@ function setPiece(s){
   second=s
 }
 
-function scrub(v,ratio,c){
-  if(!v.duration||!isFinite(v.duration))return c;
-  const want=ratio*Math.max(0,v.duration-.05);
+/* скраб по кадрам: ratio 0..1 -> индекс кадра с тем же сглаживанием, что был у видео */
+function scrub(f,ratio,c){
+  if(!f.frames.length)return c;
+  const want=ratio*Math.max(0,f.frames.length-1);
   c+=(want-c)*(reduce?1:.12);
-  if(!v.seeking&&Math.abs(v.currentTime-c)>.012)v.currentTime=c;
+  const i=Math.round(c);
+  if(i!==f.last){f.last=i;drawFrame(f,i);}
   return c
 }
 
@@ -801,8 +856,8 @@ function frame(t){
   bar.style.width=p*100+"%";
   bar.style.opacity=r.bottom>0&&r.top<innerHeight?1:0;
 
-  v1.style.opacity=p<.48?.9:0;
-  v2.style.opacity=p<.48?0:.9;
+  films[0].cv.style.opacity=p<.48?.9:0;
+  films[1].cv.style.opacity=p<.48?0:.9;
 
   let a,b;
   if(p<=.4){a=p/.4;b=0}
@@ -810,8 +865,8 @@ function frame(t){
   else if(p<.9){a=1;b=(p-.5)/.4}
   else{a=1;b=1}
 
-  c1=scrub(v1,a,c1);
-  c2=scrub(v2,b,c2);
+  c1=scrub(films[0],a,c1);
+  c2=scrub(films[1],b,c2);
 
   for(const s of ST){
     const k=cl((p-s.a)/(s.b-s.a));
@@ -857,9 +912,6 @@ function frame(t){
   requestAnimationFrame(frame)
 }
 requestAnimationFrame(frame);
-
-/* iOS only seeks a video after a touch */
-addEventListener("touchstart",()=>[v1,v2].forEach(v=>{v.play().then(()=>v.pause()).catch(()=>{})}),{once:true,passive:true});
 
 const jump=f=>goTo(story.getBoundingClientRect().top+scrollY+f*(story.offsetHeight-pin.offsetHeight));
 $("#back").addEventListener("click",()=>jump(target>=.9?.8:.33));
